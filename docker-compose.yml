@@ -1,0 +1,42 @@
+
+version: '3'
+
+services:
+  system:
+    container_name: system
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - postgres-compose-network
+
+  postgres:
+    container_name: postgres
+    image: 'postgres:12-alpine'
+    volumes:
+      - db_data:/data/postgres_dev
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=sicred
+      - PGDATA=/data/postgres_dev
+    ports:
+      - '5432:5432'
+    networks:
+      - postgres-compose-network
+    healthcheck:
+      test: pg_isready -U postgres -d sicred
+      interval: 10s
+      timeout: 20s
+      retries: 3
+
+volumes:
+  db_data:
+
+networks:
+  postgres-compose-network:
+    driver: bridge
