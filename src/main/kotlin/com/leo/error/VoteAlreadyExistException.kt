@@ -6,6 +6,6 @@ import java.lang.Exception
 @Singleton
 class VoteAlreadyExistException : Exception(message) {
     companion object {
-        const val message: String = "Vote already exist for this issue"
+        const val message: String = "Vote already exist for this issue by this user"
     }
 }

@@ -1,14 +1,19 @@
 package com.leo.useCase
 
+import com.leo.client.UserInfoClient
 import com.leo.converter.SessionConverter
 import com.leo.converter.VoteConverter
 import com.leo.entity.SessionEntity
 import com.leo.entity.VoteEntity
 import com.leo.error.ClosedSessionException
+import com.leo.error.CpfNotValidError
 import com.leo.error.DatabaseComunicationException
+import com.leo.error.UserInfoCommunicateError
+import com.leo.error.UserInfoHttpRequestError
 import com.leo.error.VoteAlreadyExistException
 import com.leo.logger.Log
 import com.leo.model.Session
+import com.leo.model.UserInfoResponse
 import com.leo.model.Vote
 import com.leo.model.VoteRequest
 import com.leo.repository.SessionRepository
@@ -24,11 +29,25 @@ class CreateVoteUseCase(
     private val sessionRepository: SessionRepository,
     private val sessionConverter: SessionConverter,
     private val voteConverter: VoteConverter,
-    private val log: Log
+    private val log: Log,
+    private val userInfoClient: UserInfoClient
 ) {
 
     fun createVote(voteRequest: VoteRequest): Vote {
         val voteDomain: Vote = voteConverter.fromRequest(voteRequest)
+
+        val userInfoResponse: UserInfoResponse?
+        try {
+            userInfoResponse = userInfoClient.validateCpf(voteDomain.cpf)
+        } catch (e: Exception) {
+            throw UserInfoCommunicateError()
+        }
+
+        if (userInfoResponse == null) {
+            throw UserInfoHttpRequestError()
+        }
+
+        validateUserInfoStatus(userInfoResponse.status)
 
         val votesEntityList: List<VoteEntity> =
             voteRepository.findByIssueAndUserId(voteDomain.issueId, voteDomain.userId)
@@ -68,5 +87,11 @@ class CreateVoteUseCase(
         }
 
         return false
+    }
+
+    private fun validateUserInfoStatus(status: String) {
+        if (status != "ABLE_TO_VOTE") {
+            throw CpfNotValidError()
+        }
     }
 }

@@ -14,7 +14,8 @@ class VoteConverter {
             issueId = voteRequest.issueId,
             sessionId = voteRequest.sessionId,
             userId = voteRequest.userId,
-            vote = voteRequest.vote
+            vote = voteRequest.vote,
+            cpf = voteRequest.cpf
         )
     }
 
@@ -23,7 +24,8 @@ class VoteConverter {
             issueId = vote.issueId,
             sessionId = vote.sessionId,
             userId = vote.userId,
-            vote = vote.vote
+            vote = vote.vote,
+            cpf = vote.cpf
         )
     }
 
@@ -33,7 +35,8 @@ class VoteConverter {
             issueId = voteEntity.issueId,
             sessionId = voteEntity.sessionId,
             userId = voteEntity.userId,
-            vote = voteEntity.vote
+            vote = voteEntity.vote,
+            cpf = voteEntity.cpf
         )
     }
 

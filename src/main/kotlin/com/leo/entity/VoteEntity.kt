@@ -14,5 +14,6 @@ data class VoteEntity(
     val issueId: Long,
     val sessionId: Long,
     val userId: Long,
-    val vote: VoteEnum
+    val vote: VoteEnum,
+    val cpf: String
 )
